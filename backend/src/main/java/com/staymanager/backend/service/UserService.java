@@ -4,6 +4,7 @@ import com.staymanager.backend.dto.RegisterRequest;
 import com.staymanager.backend.dto.UserResponse;
 import com.staymanager.backend.entity.Role;
 import com.staymanager.backend.entity.User;
+import com.staymanager.backend.exception.EmailAlreadyRegisteredException;
 import com.staymanager.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +25,7 @@ public class UserService {
         User user = new User();
         String email = request.getEmail().trim().toLowerCase(Locale.ROOT);
         if(userRepository.findByEmail(email).isPresent()){
-            throw new IllegalArgumentException("Email already registered");
+            throw new EmailAlreadyRegisteredException("Email already registered");
         }
         user.setEmail(email);
         if(request.getPassword().getBytes(StandardCharsets.UTF_8).length > 72){
