@@ -1,10 +1,12 @@
 package com.staymanager.backend.service;
 
+import com.staymanager.backend.dto.LoginRequest;
 import com.staymanager.backend.dto.RegisterRequest;
 import com.staymanager.backend.dto.UserResponse;
 import com.staymanager.backend.entity.Role;
 import com.staymanager.backend.entity.User;
 import com.staymanager.backend.exception.EmailAlreadyRegisteredException;
+import com.staymanager.backend.exception.InvalidCredentialsException;
 import com.staymanager.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +53,19 @@ public class UserService {
         response.setRole(user.getRole());
         response.setId(user.getId());
         return response;
+    }
+
+    public User login(LoginRequest request){
+        String email = request.getEmail().trim().toLowerCase(Locale.ROOT);
+        User user = userRepository.findByEmail(
+                email).orElseThrow(()
+                -> new InvalidCredentialsException("Invalid credentials"));
+
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
+            throw new InvalidCredentialsException("Invalid credentials");
+        }
+
+        return user;
+
     }
 }
