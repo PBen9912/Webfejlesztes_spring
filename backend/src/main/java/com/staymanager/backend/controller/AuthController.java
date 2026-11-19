@@ -1,8 +1,11 @@
 package com.staymanager.backend.controller;
 
 import com.staymanager.backend.dto.LoginRequest;
+import com.staymanager.backend.dto.LoginResponse;
 import com.staymanager.backend.dto.RegisterRequest;
 import com.staymanager.backend.dto.UserResponse;
+import com.staymanager.backend.entity.User;
+import com.staymanager.backend.service.JwtService;
 import com.staymanager.backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
-
+    private final JwtService jwtService;
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request){
         UserResponse response = userService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request){
-        userService.login(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request){
+
+        User user = userService.login(request);
+
+        String token = jwtService.generateToken(user);
+
+        LoginResponse loginResponse = new LoginResponse(token);
+
+        return ResponseEntity.ok(loginResponse);
     }
 }
