@@ -5,6 +5,7 @@ import com.staymanager.backend.dto.AccommodationResponse;
 import com.staymanager.backend.entity.Accommodation;
 import com.staymanager.backend.entity.User;
 import com.staymanager.backend.repository.AccommodationRepository;
+import com.staymanager.backend.repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccommodationService {
     private final AccommodationRepository accommodationRepository;
+    private final BookingRepository bookingRepository;
     public List<Accommodation> getAllAccommodations(){
         return accommodationRepository.findAll();
     }
@@ -58,6 +60,9 @@ public class AccommodationService {
     }
     public void deleteAccommodation(Long id){
         Accommodation accommodation = getAccommodationById(id);
+        if (bookingRepository.existsByAccommodation_Id(id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Accommodation cannot be deleted because it has bookings");
+        }
         accommodationRepository.delete(accommodation);
     }
 
