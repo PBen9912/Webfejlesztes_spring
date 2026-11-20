@@ -6,7 +6,10 @@ import com.staymanager.backend.entity.Accommodation;
 import com.staymanager.backend.entity.User;
 import com.staymanager.backend.repository.AccommodationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -18,8 +21,9 @@ public class AccommodationService {
     public List<Accommodation> getAllAccommodations(){
         return accommodationRepository.findAll();
     }
+
     public Accommodation getAccommodationById(Long id){
-        return accommodationRepository.findById(id).orElseThrow(()->new IllegalArgumentException("Accommodation not found"));
+        return accommodationRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Accommodation not found"));
     }
     public List<Accommodation> getAccommodationsByCity(String city){
         return accommodationRepository.findByCityIgnoreCase(city);
@@ -35,14 +39,21 @@ public class AccommodationService {
         accommodation.setOwner(owner);
         return toResponse(accommodationRepository.save(accommodation));
     }
-    public AccommodationResponse updateAccommodation(Long id, AccommodationCreateRequest request){
+    public AccommodationResponse updateAccommodation(Long id, AccommodationCreateRequest request, User user) {
+
         Accommodation accommodation = getAccommodationById(id);
+
+        if (!accommodation.getOwner().getId().equals(user.getId())) {
+            throw new AccessDeniedException("You are not the owner of this accommodation");
+        }
+
         accommodation.setCity(request.getCity());
         accommodation.setName(request.getName());
         accommodation.setAddress(request.getAddress());
         accommodation.setDescription(request.getDescription());
         accommodation.setPricePerNight(request.getPricePerNight());
         accommodation.setCapacity(request.getCapacity());
+
         return toResponse(accommodationRepository.save(accommodation));
     }
     public void deleteAccommodation(Long id){

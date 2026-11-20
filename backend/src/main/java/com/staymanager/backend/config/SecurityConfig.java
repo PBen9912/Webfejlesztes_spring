@@ -10,7 +10,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-
 import java.util.List;
 
 
@@ -24,6 +23,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/accommodations", "/api/accommodations/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated());
         http.csrf(csrf -> csrf.disable());

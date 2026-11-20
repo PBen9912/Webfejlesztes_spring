@@ -10,12 +10,14 @@ import com.staymanager.backend.exception.InvalidCredentialsException;
 import com.staymanager.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class UserService {
         }
         user.setEmail(email);
         if(request.getPassword().getBytes(StandardCharsets.UTF_8).length > 72){
-            throw new IllegalArgumentException("Password exceeds 72 bytes");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Password exceeds 72 bytes");
         }
         String hashedPassword = passwordEncoder.encode(request.getPassword());
         user.setPassword(hashedPassword);
@@ -57,9 +59,7 @@ public class UserService {
 
     public User login(LoginRequest request){
         String email = request.getEmail().trim().toLowerCase(Locale.ROOT);
-        User user = userRepository.findByEmail(
-                email).orElseThrow(()
-                -> new InvalidCredentialsException("Invalid credentials"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
 
         if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             throw new InvalidCredentialsException("Invalid credentials");
@@ -68,4 +68,9 @@ public class UserService {
         return user;
 
     }
+
+    public User findUserById(Long id){
+        return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found"));
+    }
+
 }
