@@ -9,6 +9,8 @@ import HostAccommodationsPage from './pages/HostAccommodationsPage'
 import CreateAccommodationPage from './pages/CreateAccommodationPage'
 import EditAccommodationPage from './pages/EditAccommodationPage'
 import './App.css'
+import AdminPage from "./pages/AdminPage.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
     return (
@@ -19,10 +21,21 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/accommodations/:id" element={<AccommodationDetailsPage />} />
+
+                <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
                 <Route path="/my-bookings" element={<MyBookingsPage />} />
+                </Route>
+
+                <Route element={<ProtectedRoute allowedRoles={['Host']} />} >
                 <Route path="/host/accommodations" element={<HostAccommodationsPage />} />
                 <Route path="/host/accommodations/create" element={<CreateAccommodationPage />} />
                 <Route path="/host/accommodations/:id/edit" element={<EditAccommodationPage />} />
+                </Route>
+
+                <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />} >
+                <Route path="/admin" element={<AdminPage />} />
+                </Route>
+
             </Routes>
         </BrowserRouter>
     )
