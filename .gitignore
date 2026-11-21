@@ -6,12 +6,11 @@ backend/target/
 
 
 frontend/node_modules/
-frontend/.next/
-frontend/out/
-frontend/build/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
 frontend/coverage/
-frontend/*.tsbuildinfo
-frontend/next-env.d.ts
+frontend/*.log
 
 
 .env

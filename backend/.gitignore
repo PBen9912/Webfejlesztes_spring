@@ -33,7 +33,20 @@ build/
 .vscode/
 
 # Frontend dependencies
-node_modules/
+frontend/node_modules/
 
 # Frontend build output
-dist/
+frontend/dist/
+
+frontend/.vite/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+.DS_Store
+Thumbs.db
