@@ -27,3 +27,15 @@
 .navbar-links a:hover {
     color: #93c5fd;
 }
+.logout-button {
+    background: none;
+    color: white;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    text-decoration: underline;
+}
