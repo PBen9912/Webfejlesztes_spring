@@ -1,9 +1,10 @@
+
 import { useState } from 'react'
 import './BookingForm.css'
 import { useAuth } from '../context/AuthContext'
 
 function BookingForm({ accommodation }) {
-    const { token, user } = useAuth()
+    const { token, user, logout } = useAuth()
 
     const [guestName, setGuestName] = useState('')
     const [guestEmail, setGuestEmail] = useState('')
@@ -33,7 +34,9 @@ function BookingForm({ accommodation }) {
         setSuccess('')
 
         if (nights <= 0) {
-            setError('A távozás dátumának későbbinek kell lennie az érkezés dátumánál.')
+            setError(
+                'A távozás dátumának későbbinek kell lennie az érkezés dátumánál.'
+            )
             return
         }
 
@@ -63,10 +66,40 @@ function BookingForm({ accommodation }) {
                 body: JSON.stringify(booking)
             })
 
-            const data = await response.json()
+            let data = {}
+
+            try {
+                data = await response.json()
+            } catch {
+                // A válasz nem tartalmaz feldolgozható JSON-t.
+            }
 
             if (!response.ok) {
-                throw new Error(data.message || 'Sikertelen foglalás.')
+                if (response.status === 401) {
+                    if (user && token) {
+                        logout()
+                    }
+
+                    throw new Error(
+                        'A bejelentkezésed lejárt vagy érvénytelen. Jelentkezz be újra.'
+                    )
+                }
+
+                if (response.status === 403) {
+                    throw new Error(
+                        'Nincs jogosultságod a foglalás végrehajtásához.'
+                    )
+                }
+
+                if (response.status === 409) {
+                    throw new Error(
+                        'A kiválasztott időszakra már van foglalás. Kérlek, válassz másik időpontot.'
+                    )
+                }
+
+                throw new Error(
+                    data.message || 'A foglalás sikertelen. Kérlek, próbáld újra.'
+                )
             }
 
             setSuccess('A foglalás sikeresen megtörtént!')
@@ -126,7 +159,9 @@ function BookingForm({ accommodation }) {
                     min={1}
                     max={accommodation.capacity}
                     value={guestCount}
-                    onChange={event => setGuestCount(Number(event.target.value))}
+                    onChange={event =>
+                        setGuestCount(Number(event.target.value))
+                    }
                     required
                 />
 
@@ -134,16 +169,23 @@ function BookingForm({ accommodation }) {
                     <p>Éjszakák száma: {nights}</p>
 
                     <p className="booking-total">
-                        Várható teljes ár: {totalPrice.toLocaleString('hu-HU')} Ft
+                        Várható teljes ár:{' '}
+                        {totalPrice.toLocaleString('hu-HU')} Ft
                     </p>
                 </div>
 
-                {error && <p className="booking-error">{error}</p>}
+                {error && (
+                    <p className="booking-error">{error}</p>
+                )}
 
-                {success && <p className="booking-success">{success}</p>}
+                {success && (
+                    <p className="booking-success">{success}</p>
+                )}
 
                 <button type="submit" disabled={loading}>
-                    {loading ? 'Foglalás folyamatban...' : 'Foglalás véglegesítése'}
+                    {loading
+                        ? 'Foglalás folyamatban...'
+                        : 'Foglalás véglegesítése'}
                 </button>
             </form>
         </section>

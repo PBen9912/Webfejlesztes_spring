@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import './MyBookingsPage.css'
 
 function MyBookingsPage() {
-    const { token, user } = useAuth()
+    const { token, user, logout } = useAuth()
 
     const [bookings, setBookings] = useState([])
     const [loading, setLoading] = useState(true)
@@ -23,37 +24,62 @@ function MyBookingsPage() {
         }
 
         let active = true
+        const controller = new AbortController()
 
         setLoading(true)
         setError('')
 
-        fetch('/api/bookings/my', {
-            headers: {
-                Authorization: 'Bearer ' + token
-            }
-        })
-            .then(response => {
+        async function loadBookings() {
+            try {
+                const response = await fetch('/api/bookings/my', {
+                    headers: {
+                        Authorization: 'Bearer ' + token
+                    },
+                    signal: controller.signal
+                })
+
+                if (response.status === 401) {
+                    if (active) logout()
+                    return
+                }
+
+                if (response.status === 403) {
+                    throw new Error(
+                        'Nincs jogosultságod a foglalások megtekintéséhez.'
+                    )
+                }
+
                 if (!response.ok) {
                     throw new Error('A foglalások nem tölthetők be.')
                 }
-                return response.json()
-            })
-            .then(data => {
-                if (active) setBookings(data)
-            })
-            .catch(error => {
-                if (active) setError(error.message)
-            })
-            .finally(() => {
-                if (active) setLoading(false)
-            })
+
+                const data = await response.json()
+
+                if (active) {
+                    setBookings(data)
+                }
+            } catch (error) {
+                if (active && error.name !== 'AbortError') {
+                    setError(error.message)
+                }
+            } finally {
+                if (active) {
+                    setLoading(false)
+                }
+            }
+        }
+
+        loadBookings()
 
         return () => {
             active = false
+            controller.abort()
         }
-    }, [token, userId])
+    }, [token, userId, logout])
 
     async function handleCancel(bookingId) {
+        if (!token || cancelingId !== null) return
+
         const confirmed = window.confirm(
             'Biztosan le szeretnéd mondani ezt a foglalást?'
         )
@@ -73,6 +99,29 @@ function MyBookingsPage() {
                     }
                 }
             )
+
+            if (response.status === 401) {
+                logout()
+                return
+            }
+
+            if (response.status === 403) {
+                throw new Error(
+                    'Nincs jogosultságod ennek a foglalásnak a lemondásához.'
+                )
+            }
+
+            if (response.status === 404) {
+                throw new Error(
+                    'A foglalás nem található.'
+                )
+            }
+
+            if (response.status === 409) {
+                throw new Error(
+                    'A foglalás jelenlegi állapotában nem mondható le.'
+                )
+            }
 
             if (!response.ok) {
                 throw new Error('A foglalás lemondása sikertelen.')
@@ -176,8 +225,9 @@ function MyBookingsPage() {
                                 </p>
 
                                 <p className="my-booking-price">
-                                    Teljes ár: {Number(booking.totalPrice)
-                                    .toLocaleString('hu-HU')} Ft
+                                    Teljes ár:{' '}
+                                    {Number(booking.totalPrice)
+                                        .toLocaleString('hu-HU')} Ft
                                 </p>
 
                                 <div className="my-booking-actions">
@@ -192,7 +242,9 @@ function MyBookingsPage() {
                                         <button
                                             type="button"
                                             className="cancel-booking-button"
-                                            onClick={() => handleCancel(booking.id)}
+                                            onClick={() =>
+                                                handleCancel(booking.id)
+                                            }
                                             disabled={cancelingId !== null}
                                         >
                                             {cancelingId === booking.id

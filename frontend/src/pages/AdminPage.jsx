@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import './AdminPage.css'
 
 function AdminPage() {
-    const { user, token } = useAuth()
+    const { user, token, logout } = useAuth()
 
     const [accommodations, setAccommodations] = useState([])
     const [loading, setLoading] = useState(true)
@@ -79,16 +79,28 @@ function AdminPage() {
                 }
             )
 
+
             if (!response.ok) {
-                if (response.status === 409) {
+                if (response.status === 401) {
+                    logout()
+                    return
+                }
+
+                if (response.status === 403) {
                     throw new Error(
-                        'A szállás nem törölhető, mert már tartozik hozzá foglalás.'
+                        'Nincs jogosultságod a szállás törléséhez.'
                     )
                 }
 
-                if (response.status === 401 || response.status === 403) {
+                if (response.status === 404) {
                     throw new Error(
-                        'Nincs jogosultságod a szállás törléséhez, vagy lejárt a bejelentkezésed.'
+                        'A szállás nem található. Lehetséges, hogy már törölték.'
+                    )
+                }
+
+                if (response.status === 409) {
+                    throw new Error(
+                        'A szállás nem törölhető, mert már tartozik hozzá foglalás.'
                     )
                 }
 
