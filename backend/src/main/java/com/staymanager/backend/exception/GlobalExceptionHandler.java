@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
         while (cause != null) {
             if (cause instanceof SQLException sqlException) {
                 if ("23P01".equals(sqlException.getSQLState()) && sqlException.getMessage() != null && sqlException.getMessage().contains("bookings_no_overlap")) {
-                    return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse("Accommodation is already booked for these dates"));
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse("A szállás a kiválasztott időszakban már foglalt."));
                 }
             }
             cause = cause.getCause();

@@ -45,7 +45,7 @@ public class BookingService {
         boolean overlapping = bookingRepository.existsOverlappingBooking(accommodation.getId(), checkIn, checkOut, BookingStatus.CONFIRMED);
 
         if (overlapping) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Accommodation is already booked for these dates");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A szállás a kiválasztott időszakban már foglalt.");
         }
 
         long nights = ChronoUnit.DAYS.between(checkIn, checkOut);

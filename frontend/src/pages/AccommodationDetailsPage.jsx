@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import './AccommodationDetailsPage.css'
-
+import BookingForm from '../components/BookingForm'
 function AccommodationDetailsPage() {
     const { id } = useParams()
 
@@ -63,7 +63,7 @@ function AccommodationDetailsPage() {
                 <p className="details-price">
                     {accommodation.pricePerNight.toLocaleString('hu-HU')} Ft / éjszaka
                 </p>
-
+                <BookingForm accommodation={accommodation} />
             </section>
 
         </main>
