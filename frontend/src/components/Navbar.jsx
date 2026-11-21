@@ -13,7 +13,9 @@ function Navbar() {
 
     return (
         <nav className="navbar">
-            <h1>StayManager</h1>
+            <Link to="/" className="navbar-logo">
+                StayManager
+            </Link>
 
             <div className="navbar-links">
                 <Link to="/">Szállások</Link>

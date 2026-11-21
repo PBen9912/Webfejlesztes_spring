@@ -39,3 +39,7 @@
 .logout-button:hover {
     text-decoration: underline;
 }
+.navbar-logo {
+    text-decoration: none;
+    color: inherit;
+}
