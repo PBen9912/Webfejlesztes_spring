@@ -1,5 +1,5 @@
 import './AccommodationCard.css'
-
+import { Link } from 'react-router-dom'
 function AccommodationCard({ accommodation }) {
     return (
         <article className="accommodation-card">
@@ -15,9 +15,12 @@ function AccommodationCard({ accommodation }) {
                 {accommodation.pricePerNight.toLocaleString('hu-HU')} Ft / éjszaka
             </p>
 
-            <button className="details-button">
+            <Link
+                to={`/accommodations/${accommodation.id}`}
+                className="details-button"
+            >
                 Részletek
-            </button>
+            </Link>
         </article>
     )
 }
