@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import './BookingForm.css'
+import { useAuth } from '../context/AuthContext'
 
 function BookingForm({ accommodation }) {
+    const { token, user } = useAuth()
+
     const [guestName, setGuestName] = useState('')
     const [guestEmail, setGuestEmail] = useState('')
     const [checkIn, setCheckIn] = useState('')
@@ -22,6 +25,7 @@ function BookingForm({ accommodation }) {
     }
 
     const totalPrice = nights * accommodation.pricePerNight
+
     async function handleSubmit(event) {
         event.preventDefault()
 
@@ -44,12 +48,18 @@ function BookingForm({ accommodation }) {
 
         setLoading(true)
 
+        const headers = {
+            'Content-Type': 'application/json'
+        }
+
+        if (user && token) {
+            headers.Authorization = 'Bearer ' + token
+        }
+
         try {
             const response = await fetch('/api/bookings', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: headers,
                 body: JSON.stringify(booking)
             })
 
@@ -67,6 +77,7 @@ function BookingForm({ accommodation }) {
             setLoading(false)
         }
     }
+
     return (
         <section className="booking-form">
             <h2>Szállásfoglalás</h2>
@@ -118,6 +129,7 @@ function BookingForm({ accommodation }) {
                     onChange={event => setGuestCount(Number(event.target.value))}
                     required
                 />
+
                 <div className="booking-summary">
                     <p>Éjszakák száma: {nights}</p>
 
@@ -125,8 +137,11 @@ function BookingForm({ accommodation }) {
                         Várható teljes ár: {totalPrice.toLocaleString('hu-HU')} Ft
                     </p>
                 </div>
+
                 {error && <p className="booking-error">{error}</p>}
+
                 {success && <p className="booking-success">{success}</p>}
+
                 <button type="submit" disabled={loading}>
                     {loading ? 'Foglalás folyamatban...' : 'Foglalás véglegesítése'}
                 </button>
