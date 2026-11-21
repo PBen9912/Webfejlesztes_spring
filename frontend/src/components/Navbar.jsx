@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import './Navbar.css'
 
 function Navbar() {
@@ -6,9 +7,9 @@ function Navbar() {
             <h1 className="navbar-logo">StayManager</h1>
 
             <div className="navbar-links">
-                <button>Szállások</button>
-                <button>Bejelentkezés</button>
-                <button>Regisztráció</button>
+                <Link to="/">Szállások</Link>
+                <Link to="/login">Bejelentkezés</Link>
+                <Link to="/register">Regisztráció</Link>
             </div>
         </nav>
     )
