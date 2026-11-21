@@ -1,0 +1,93 @@
+
+.host-accommodations-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.host-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.host-page-header h1 {
+    color: #1e3a5f;
+    margin-bottom: 10px;
+}
+
+.host-page-header p {
+    color: #555;
+}
+
+.host-accommodations-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.host-accommodation-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.host-accommodation-card h2 {
+    color: #1e3a5f;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.host-accommodation-card p {
+    margin: 10px 0;
+    overflow-wrap: anywhere;
+}
+
+.host-accommodation-price {
+    color: #1e3a5f;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.host-accommodation-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.host-view-button {
+    display: inline-block;
+    padding: 12px 16px;
+    background-color: #1e3a5f;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    text-align: center;
+}
+
+.host-view-button:hover {
+    background-color: #2c5282;
+}
+
+.host-empty-state {
+    margin-top: 20px;
+    padding: 25px;
+    background-color: white;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+.host-empty-state h2 {
+    color: #1e3a5f;
+}
+
+.host-accommodations-error {
+    color: #b91c1c;
+    background-color: #fee2e2;
+    padding: 12px;
+    border-radius: 6px;
+}

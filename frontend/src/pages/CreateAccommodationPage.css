@@ -1,0 +1,88 @@
+
+.create-accommodation-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.create-accommodation-back {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #1e3a5f;
+    text-decoration: none;
+}
+
+.create-accommodation-back:hover {
+    text-decoration: underline;
+}
+
+.create-accommodation-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.create-accommodation-container h1 {
+    color: #1e3a5f;
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.create-accommodation-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.create-accommodation-container label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.create-accommodation-container input,
+.create-accommodation-container textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font: inherit;
+    box-sizing: border-box;
+}
+
+.create-accommodation-container textarea {
+    resize: vertical;
+}
+
+.create-accommodation-container input:focus,
+.create-accommodation-container textarea:focus {
+    outline: 2px solid #2c5282;
+    outline-offset: 1px;
+}
+
+.create-accommodation-container button {
+    background-color: #1e3a5f;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    margin-top: 20px;
+}
+
+.create-accommodation-container button:hover:not(:disabled) {
+    background-color: #2c5282;
+}
+
+.create-accommodation-container button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.create-accommodation-error {
+    color: #b91c1c;
+    background-color: #fee2e2;
+    padding: 12px;
+    border-radius: 6px;
+}
