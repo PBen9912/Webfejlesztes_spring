@@ -26,7 +26,7 @@ function App() {
                 <Route path="/my-bookings" element={<MyBookingsPage />} />
                 </Route>
 
-                <Route element={<ProtectedRoute allowedRoles={['Host']} />} >
+                <Route element={<ProtectedRoute allowedRoles={['HOST']} />} >
                 <Route path="/host/accommodations" element={<HostAccommodationsPage />} />
                 <Route path="/host/accommodations/create" element={<CreateAccommodationPage />} />
                 <Route path="/host/accommodations/:id/edit" element={<EditAccommodationPage />} />
