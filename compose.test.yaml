@@ -1,0 +1,17 @@
+services:
+  db-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: staymanager_test
+      POSTGRES_USER: staymanager_test
+      POSTGRES_PASSWORD: test_password
+    ports:
+      - target: 5432
+        published: "5433"
+        host_ip: 127.0.0.1
+        protocol: tcp
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U staymanager_test -d staymanager_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
