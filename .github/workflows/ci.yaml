@@ -46,6 +46,13 @@ jobs:
           path: backend/target/*.jar
           if-no-files-found: 'error'
 
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          name: 'staymanager-coverage-report'
+          path: backend/target/site/jacoco
+          if-no-files-found: 'error'
+
   publish:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
