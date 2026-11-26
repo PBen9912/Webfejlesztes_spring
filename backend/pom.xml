@@ -29,6 +29,13 @@
 	<properties>
 		<java.version>25</java.version>
 	</properties>
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/pben9912/webfejlesztes_spring</url>
+		</repository>
+	</distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
