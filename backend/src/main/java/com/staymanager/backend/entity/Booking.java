@@ -1,49 +1,61 @@
 package com.staymanager.backend.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
+/** Represents an accommodation reservation for a specified date range. */
 @Entity
 @Table(name = "bookings")
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 public class Booking {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "accommodation_id", nullable = false)
-    private Accommodation accommodation;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "accommodation_id", nullable = false)
+  private Accommodation accommodation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-    @Column(name = "guest_name", length = 100, nullable = false)
-    private String guestName;
+  @Column(name = "guest_name", length = 100, nullable = false)
+  private String guestName;
 
-    @Column(name = "guest_email", length = 254,nullable = false)
-    private String guestEmail;
+  @Column(name = "guest_email", length = 254, nullable = false)
+  private String guestEmail;
 
-    @Column(name = "check_in", nullable = false)
-    private LocalDate checkIn;
+  @Column(name = "check_in", nullable = false)
+  private LocalDate checkIn;
 
-    @Column(name = "check_out", nullable = false)
-    private LocalDate checkOut;
+  @Column(name = "check_out", nullable = false)
+  private LocalDate checkOut;
 
-    @Column(name = "guest_count", nullable = false)
-    private Integer guestCount;
+  @Column(name = "guest_count", nullable = false)
+  private Integer guestCount;
 
-    @Column(name = "total_price", nullable = false, precision = 12, scale = 2)
-    private BigDecimal totalPrice;
+  @Column(name = "total_price", nullable = false, precision = 12, scale = 2)
+  private BigDecimal totalPrice;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private BookingStatus status = BookingStatus.CONFIRMED;
-
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private BookingStatus status = BookingStatus.CONFIRMED;
 }

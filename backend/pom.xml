@@ -28,6 +28,8 @@
 	</scm>
 	<properties>
 		<java.version>25</java.version>
+		<checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
+		<checkstyle.version>14.4.0</checkstyle.version>
 	</properties>
 	<distributionManagement>
 		<repository>
@@ -183,6 +185,37 @@
 								</rule>
 							</rules>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${checkstyle.plugin.version}</version>
+
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>${checkstyle.version}</version>
+					</dependency>
+				</dependencies>
+
+				<configuration>
+					<configLocation>google_checks.xml</configLocation>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
+					<consoleOutput>true</consoleOutput>
+					<failOnViolation>true</failOnViolation>
+					<violationSeverity>warning</violationSeverity>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>checkstyle-check</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>

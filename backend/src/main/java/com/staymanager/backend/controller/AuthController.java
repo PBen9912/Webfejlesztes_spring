@@ -16,26 +16,41 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/** Provides REST endpoints for user registration and authentication. */
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final UserService userService;
-    private final JwtService jwtService;
-    @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request){
-        UserResponse response = userService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request){
+  private final UserService userService;
+  private final JwtService jwtService;
 
-        User user = userService.login(request);
+  /**
+   * Registers a new user account.
+   *
+   * @param request the user registration details
+   * @return the registered user with HTTP status 201
+   */
+  @PostMapping("/register")
+  public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
+    UserResponse response = userService.register(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
 
-        String token = jwtService.generateToken(user);
+  /**
+   * Authenticates a user and generates a JWT.
+   *
+   * @param request the user's login credentials
+   * @return the login response containing the generated JWT
+   */
+  @PostMapping("/login")
+  public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
 
-        LoginResponse loginResponse = new LoginResponse(token);
+    User user = userService.login(request);
 
-        return ResponseEntity.ok(loginResponse);
-    }
+    String token = jwtService.generateToken(user);
+
+    LoginResponse loginResponse = new LoginResponse(token);
+
+    return ResponseEntity.ok(loginResponse);
+  }
 }

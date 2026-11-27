@@ -1,5 +1,15 @@
 package com.staymanager.backend.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 import com.staymanager.backend.dto.LoginRequest;
 import com.staymanager.backend.dto.RegisterRequest;
 import com.staymanager.backend.dto.UserResponse;
@@ -8,6 +18,7 @@ import com.staymanager.backend.entity.User;
 import com.staymanager.backend.exception.EmailAlreadyRegisteredException;
 import com.staymanager.backend.exception.InvalidCredentialsException;
 import com.staymanager.backend.repository.UserRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -17,207 +28,207 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
+  @Mock private UserRepository userRepository;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
+  @Mock private PasswordEncoder passwordEncoder;
 
-    @InjectMocks
-    private UserService userService;
+  @InjectMocks private UserService userService;
 
-    @Test
-    void loginShouldThrowWhenUserNotFound() {
+  @Test
+  void loginShouldThrowWhenUserNotFound() {
 
-        LoginRequest request = new LoginRequest();
-        request.setEmail("test@example.com");
-        request.setPassword("testPassword");
+    LoginRequest request = new LoginRequest();
+    request.setEmail("test@example.com");
+    request.setPassword("testPassword");
 
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
+    when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
 
-        assertThrows(InvalidCredentialsException.class,() -> userService.login(request));
-    }
-    @Test
-    void loginShouldThrowWhenPasswordIsInvalid() {
+    assertThrows(InvalidCredentialsException.class, () -> userService.login(request));
+  }
 
-        LoginRequest request = new LoginRequest();
-        request.setEmail("test@example.com");
-        request.setPassword("wrongPassword");
+  @Test
+  void loginShouldThrowWhenPasswordIsInvalid() {
 
-        User user = new User();
-        user.setEmail("test@example.com");
-        user.setPassword("encodedPassword");
+    LoginRequest request = new LoginRequest();
+    request.setEmail("test@example.com");
+    request.setPassword("wrongPassword");
 
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+    User user = new User();
+    user.setEmail("test@example.com");
+    user.setPassword("encodedPassword");
 
-        when(passwordEncoder.matches("wrongPassword","encodedPassword")).thenReturn(false);
+    when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
 
-        assertThrows(InvalidCredentialsException.class, () -> userService.login(request));
-    }
-    @Test
-    void loginShouldReturnUserWhenCredentialsAreValid(){
-        LoginRequest request = new LoginRequest();
-        request.setEmail("test@example.com");
-        request.setPassword("testPassword");
+    when(passwordEncoder.matches("wrongPassword", "encodedPassword")).thenReturn(false);
 
-        User user = new User();
-        user.setEmail("test@example.com");
-        user.setPassword("encodedPassword");
+    assertThrows(InvalidCredentialsException.class, () -> userService.login(request));
+  }
 
-        when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(request.getPassword(),user.getPassword())).thenReturn(true);
+  @Test
+  void loginShouldReturnUserWhenCredentialsAreValid() {
+    LoginRequest request = new LoginRequest();
+    request.setEmail("test@example.com");
+    request.setPassword("testPassword");
 
-        User result = userService.login(request);
+    User user = new User();
+    user.setEmail("test@example.com");
+    user.setPassword("encodedPassword");
 
-        assertSame(user, result);
-    }
-    @Test
-    void loginShouldNormalizeEmail() {
+    when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(request.getPassword(), user.getPassword())).thenReturn(true);
 
-        LoginRequest request = new LoginRequest();
-        request.setEmail("  TEST@Example.COM  ");
-        request.setPassword("testPassword");
+    User result = userService.login(request);
 
-        User user = new User();
-        user.setEmail("test@example.com");
-        user.setPassword("encodedPassword");
+    assertSame(user, result);
+  }
 
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(request.getPassword(),user.getPassword())).thenReturn(true);
+  @Test
+  void loginShouldNormalizeEmail() {
 
-        User result = userService.login(request);
+    LoginRequest request = new LoginRequest();
+    request.setEmail("  TEST@Example.COM  ");
+    request.setPassword("testPassword");
 
-        assertSame(user, result);
+    User user = new User();
+    user.setEmail("test@example.com");
+    user.setPassword("encodedPassword");
 
-        verify(userRepository).findByEmail("test@example.com");
+    when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(request.getPassword(), user.getPassword())).thenReturn(true);
 
-    }
-    @Test
-    void registerShouldThrowWhenEmailAlreadyExists() {
+    User result = userService.login(request);
 
-        RegisterRequest request = new RegisterRequest();
-        request.setName("Test User");
-        request.setEmail("test@example.com");
-        request.setPassword("testPassword");
+    assertSame(user, result);
 
-        User user = new User();
-        user.setEmail("test@example.com");
+    verify(userRepository).findByEmail("test@example.com");
+  }
 
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+  @Test
+  void registerShouldThrowWhenEmailAlreadyExists() {
 
-        assertThrows(EmailAlreadyRegisteredException.class, () -> userService.register(request));
+    RegisterRequest request = new RegisterRequest();
+    request.setName("Test User");
+    request.setEmail("test@example.com");
+    request.setPassword("testPassword");
 
-        verifyNoInteractions(passwordEncoder);
-        verify(userRepository, never()).save(any(User.class));
-    }
-    @Test
-    void registerShouldThrowWhenPasswordExceeds72Bytes(){
-        RegisterRequest request = new RegisterRequest();
-        request.setName("Test User");
-        request.setEmail("test@example.com");
-        request.setPassword("á".repeat(37));
+    User user = new User();
+    user.setEmail("test@example.com");
 
-        when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
+    when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.register(request));
+    assertThrows(EmailAlreadyRegisteredException.class, () -> userService.register(request));
 
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        verifyNoInteractions(passwordEncoder);
-        verify(userRepository, never()).save(any(User.class));
-    }
+    verifyNoInteractions(passwordEncoder);
+    verify(userRepository, never()).save(any(User.class));
+  }
 
-    @Test
-    void registerShouldCreateHostUser() {
+  @Test
+  void registerShouldThrowWhenPasswordExceeds72Bytes() {
+    RegisterRequest request = new RegisterRequest();
+    request.setName("Test User");
+    request.setEmail("test@example.com");
+    request.setPassword("á".repeat(37));
 
-        RegisterRequest request = new RegisterRequest();
-        request.setName("Test User");
-        request.setEmail("  TEST@Example.COM  ");
-        request.setPassword("testPassword");
-        request.setHostRegistration(true);
+    when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
 
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
+    ResponseStatusException exception =
+        assertThrows(ResponseStatusException.class, () -> userService.register(request));
 
-        when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
+    assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+    verifyNoInteractions(passwordEncoder);
+    verify(userRepository, never()).save(any(User.class));
+  }
 
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+  @Test
+  void registerShouldCreateHostUser() {
 
-        UserResponse result = userService.register(request);
+    RegisterRequest request = new RegisterRequest();
+    request.setName("Test User");
+    request.setEmail("  TEST@Example.COM  ");
+    request.setPassword("testPassword");
+    request.setHostRegistration(true);
 
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(captor.capture());
+    when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
 
-        User savedUser = captor.getValue();
+    when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
 
-        assertEquals("test@example.com", savedUser.getEmail());
-        assertEquals(request.getName(), savedUser.getName());
-        assertEquals("encodedPassword", savedUser.getPassword());
-        assertEquals(Role.HOST, savedUser.getRole());
-        assertEquals(Role.HOST, result.getRole());
-        assertNotNull(result);
-    }
-    @Test
-    void registerShouldCreateUser() {
+    when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        RegisterRequest request = new RegisterRequest();
-        request.setName("Test User");
-        request.setEmail("  TEST@Example.COM  ");
-        request.setPassword("testPassword");
-        request.setHostRegistration(false);
+    final UserResponse result = userService.register(request);
 
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
+    ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+    verify(userRepository).save(captor.capture());
 
-        when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
+    User savedUser = captor.getValue();
 
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    assertEquals("test@example.com", savedUser.getEmail());
+    assertEquals(request.getName(), savedUser.getName());
+    assertEquals("encodedPassword", savedUser.getPassword());
+    assertEquals(Role.HOST, savedUser.getRole());
+    assertEquals(Role.HOST, result.getRole());
+    assertNotNull(result);
+  }
 
-        UserResponse result = userService.register(request);
+  @Test
+  void registerShouldCreateUser() {
 
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(captor.capture());
+    RegisterRequest request = new RegisterRequest();
+    request.setName("Test User");
+    request.setEmail("  TEST@Example.COM  ");
+    request.setPassword("testPassword");
+    request.setHostRegistration(false);
 
-        User savedUser = captor.getValue();
+    when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
 
-        assertEquals("test@example.com", savedUser.getEmail());
-        assertEquals(request.getName(), savedUser.getName());
-        assertEquals("encodedPassword", savedUser.getPassword());
-        assertEquals(Role.USER, savedUser.getRole());
-        assertEquals(Role.USER, result.getRole());
-        assertNotNull(result);
-    }
-    @Test
-    void findUserByIdShouldReturnUserWhenExists() {
+    when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
 
-        Long id = 1L;
+    when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User user = new User();
-        user.setId(id);
+    final UserResponse result = userService.register(request);
 
-        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+    ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+    verify(userRepository).save(captor.capture());
 
-        User foundUser = userService.findUserById(id);
+    User savedUser = captor.getValue();
 
-        assertSame(user, foundUser);
-    }
-    @Test
-    void findUserByIdShouldThrowWhenUserNotFound() {
+    assertEquals("test@example.com", savedUser.getEmail());
+    assertEquals(request.getName(), savedUser.getName());
+    assertEquals("encodedPassword", savedUser.getPassword());
+    assertEquals(Role.USER, savedUser.getRole());
+    assertEquals(Role.USER, result.getRole());
+    assertNotNull(result);
+  }
 
-        Long id = 1L;
+  @Test
+  void findUserByIdShouldReturnUserWhenExists() {
 
-        when(userRepository.findById(id)).thenReturn(Optional.empty());
+    Long id = 1L;
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->userService.findUserById(id));
+    User user = new User();
+    user.setId(id);
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        assertEquals("User not found", exception.getReason());
-    }
+    when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
+    User foundUser = userService.findUserById(id);
 
+    assertSame(user, foundUser);
+  }
+
+  @Test
+  void findUserByIdShouldThrowWhenUserNotFound() {
+
+    Long id = 1L;
+
+    when(userRepository.findById(id)).thenReturn(Optional.empty());
+
+    ResponseStatusException exception =
+        assertThrows(ResponseStatusException.class, () -> userService.findUserById(id));
+
+    assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+    assertEquals("User not found", exception.getReason());
+  }
 }
